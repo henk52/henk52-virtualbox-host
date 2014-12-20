@@ -24,17 +24,20 @@ $szVboxFedoraRpmFileName = 'VirtualBox-4.3-4.3.18_96516_fedora18-1.x86_64.rpm'
 exec { 'get_VBoxFedoraRpm':
   creates => "/tmp/$szVboxFedoraRpmFileName",
   command => "/usr/bin/wget --directory-prefix=/tmp http://10.1.233.3:/storage/$szVboxFedoraRpmFileName",
+  path => [ '/usr/bin' ],
 }
 
   
 exec { 'install_VBoxFedoraRpm':
-  creates => '/opt/DUDE',
-  command => "rpm -ivh /tmp/$szVboxFedoraRpmFileName",
+  creates => '/usr/src/vboxhost-4.3.18',
+  command => "yum localinstall --assumeyes /tmp/$szVboxFedoraRpmFileName",
+  path => [ '/usr/bin' ],
   require => [
-               File [ "/tmp/$szVboxFedoraRpmFileName" ],
+               Exec [ 'get_VBoxFedoraRpm' ],
                Package [ $arPackageList ],
              ],
 }
+#               File [ "/tmp/$szVboxFedoraRpmFileName" ],
 
 
 #/etc/init.d/vboxdrv setup
